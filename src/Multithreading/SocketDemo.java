@@ -19,9 +19,9 @@ public class SocketDemo {
                 out.println("欢迎你XXX");
                 out.flush();
 
-                //启动收消息线程
-                GetMessageThread getMessageThread = new GetMessageThread(socket);
-                getMessageThread.start();
+//                启动收消息线程
+                ReceiveInfo receiveInfo = new ReceiveInfo(socket);
+                receiveInfo.start();
             }
         } catch (IOException e) {
             e.printStackTrace();

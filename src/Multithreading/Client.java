@@ -16,7 +16,6 @@ public class Client {
             System.out.println("服务器端说："+serverMessage);
             Scanner sc = new Scanner(System.in);
             while(true) {
-
                 System.out.println("请输入你要发送的消息：");
                 String message = sc.next();
                 OutputStream os = socket.getOutputStream();
