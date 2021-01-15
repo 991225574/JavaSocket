@@ -98,6 +98,8 @@ public class LoginThread extends Thread {
                         System.out.println(encodePassword);
                         if (MD5.checkpassword(password, encodePassword)) {
                             System.out.println("µÇÂ¼³É¹¦");
+                            ChatThreadWindow cd= new ChatThreadWindow();
+
                         } else {
                             System.out.println("µÇÂ¼Ê§°Ü");
                         }

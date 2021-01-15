@@ -4,10 +4,9 @@
     <file url="file://$PROJECT_DIR$/src/Multithreading/Client.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/Multithreading/GetMessageThread.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/Multithreading/SocketDemo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/Project/ChatThreadWindow.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/Project/LoginThread.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/simpleSocket/Client.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/src/simpleSocket/Client.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/src/simpleSocket/SocketDemo.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/simpleSocket/SocketDemo.java" charset="GBK" />
     <file url="PROJECT" charset="GBK" />
   </component>
