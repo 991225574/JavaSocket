@@ -20,10 +20,10 @@ public class MD5 {
         String newstr=base64en.encode(md5.digest(str.getBytes("utf-8")));
         return newstr;
     }
-
-    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        System.out.println(encoderByMd5("liwei123"));
-    }
+//
+//    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+//        System.out.println(encoderByMd5("liwei123"));
+//    }
 
     /**判断用户密码是否正确
      * @param newpasswd  用户输入的密码

@@ -1,6 +1,9 @@
 package Project;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
+import java.net.*;
+import java.sql.*;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -11,24 +14,30 @@ import javax.swing.JTextField;
 
 
 /**
- * èŠå¤©çº¿ç¨‹
+ * ÁÄÌìÏß³Ì
  */
 public class ChatThreadWindow {
-    private String name;
-    private JComboBox cb;
+    String name;            //Ä¬ÈÏÈ¨ÏŞ
+    DatagramSocket ds;
+    JComboBox cb;
     private JFrame f;
-    private JTextArea ta;
+    JTextArea ta;
     private JTextField tf;
-    private static int total;// åœ¨çº¿äººæ•°ç»Ÿè®¡
+    private static int total=0;// ÔÚÏßÈËÊıÍ³¼Æ
 
-    public ChatThreadWindow() {
+    //¹¹Ôì·½·¨
+    public ChatThreadWindow(String name, DatagramSocket ds) {
+        //¸³Öµ±äÁ¿
+        this.ds=ds;
+        this.name=name;
+
         /*
-         * è®¾ç½®èŠå¤©å®¤çª—å£ç•Œé¢
+         * ÉèÖÃÁÄÌìÊÒ´°¿Ú½çÃæ
          */
         f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setSize(600, 400);
-        f.setTitle("èŠå¤©å®¤" + " - " + name + "     å½“å‰åœ¨çº¿äººæ•°:" + ++total);
+        f.setTitle("ÁÄÌìÊÒ" + " - " + name + "     µ±Ç°ÔÚÏßÈËÊı:" + ++total);
         f.setLocation(300, 200);
         ta = new JTextArea();
         JScrollPane sp = new JScrollPane(ta);
@@ -36,7 +45,7 @@ public class ChatThreadWindow {
         tf = new JTextField();
         cb = new JComboBox();
         cb.addItem("All");
-        JButton jb = new JButton("ç§èŠçª—å£");
+        JButton jb = new JButton("Ë½ÁÄ´°¿Ú");
         JPanel pl = new JPanel(new BorderLayout());
         pl.add(cb);
         pl.add(jb, BorderLayout.WEST);
@@ -46,5 +55,64 @@ public class ChatThreadWindow {
         f.getContentPane().add(p, BorderLayout.SOUTH);
         f.getContentPane().add(sp);
         f.setVisible(true);
+
+        //¶àÏß³Ì£¬´´½¨GetMessageThread¶ÔÏó
+        GetMessageThread gt=new GetMessageThread(this);
+        //µ÷ÓÃËüµÄ·½·¨
+        gt.start();
+
+        ShowInfoChatRoom(); //µ÷ÓÃÌáÊ¾·½·¨
     }
+
+    //×÷ÓÃ£º»ñÈ¡Êı¾İ¿âÒÑµÇÂ½µÄÓÃ»§ĞÅÏ¢£¬È»ºó°Ñ×Ô¼ºµÇÂ½µÄĞÅÏ¢·¢¸øËûÃÇ
+    public void ShowInfoChatRoom(){
+        String url="jdbc:oracle:thin:@localhost:1521:orcl";
+        String username_db="scott";
+        String pssword_db="123";
+        PreparedStatement pstmt=null;
+        Connection conn=null;
+
+        try {
+            //²éÑ¯µÇÂ½µÄÓÃ»§£¬ÇÒ·µ»ØËûÃÇµÄipºÍport
+            conn=DriverManager.getConnection(url,username_db,pssword_db);
+            String sql="select username,ip,port from users where status='online'";
+            pstmt=conn.prepareStatement(sql);
+            ResultSet rs =pstmt.executeQuery();
+
+            while (rs.next()){
+                String username=rs.getString("username");
+                String ip=rs.getString("ip");
+                int port=rs.getInt("port");
+
+                byte[] ipB=new byte[4];   //¶¨Òå×Ö½Ú³¤¶ÈÎª4µÄÊı×é
+
+                String ips[] =ip.split("\\.");  //°ÑipÖĞµÄÊı×Ö³ıÁË.¶¼·Ö¸î³öÀ´
+                //±éÀúÊı×Ö³öÀ´
+                for (int i=0;i<ips.length;i++){
+                    ipB[i]=(byte)Integer.parseInt(ips[i]);   //°ÑÊı×ÖÇ¿ÖÆ×ª»»Îª×Ö½ÚÊı×éÀàĞÍ
+                }
+//                System.out.println(ip);
+//                System.out.println(port);
+//                System.out.println(username);
+//                System.out.println(name);
+
+                //ÅĞ¶Ï²»Îª×Ô¼º£¬È»ºóÈº·¢ÏûÏ¢
+                if(!username.equals(name)){
+                    String message=name+"½øÈëÁËÁÄÌìÊÒ";
+                    byte[] m=message.getBytes();  //´´½¨Ò»¸ö×Ö½ÚÊı×é
+                    DatagramPacket dp=new DatagramPacket(m,m.length);
+                    dp.setAddress(InetAddress.getByAddress(ipB));    //ÉèÖÃipµØÖ·
+                    dp.setPort(port);                                //ÉèÖÃ¶Ë¿Ú
+                    DatagramSocket ds=new DatagramSocket();
+                    ds.send(dp);                                     //ÏòÒÑ¾­µÇÂ¼µÄÓÃ»§·¢ÏûÏ¢
+                }
+            }
+
+        } catch (SQLException | UnknownHostException | SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

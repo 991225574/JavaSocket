@@ -5,10 +5,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import javax.swing.JButton;
@@ -97,39 +94,49 @@ public class LoginThread extends Thread {
                     pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, username);
                     ResultSet rs = pstmt.executeQuery();
+
                     if (rs.next()) {
                         String encodePassword = rs.getString("PASSWORD");
-                        System.out.println(password);
-
-                        if (MD5.checkpassword(password, encodePassword)) {
+                        if (MD5.checkpassword(password,encodePassword)) {
                             /*
                             获取本机IP
                             开启一个端口8888
                             隐藏登录界面
                             显示聊天窗口
                              */
+                            //创建主机对象，接着获取主机地址
                             InetAddress addr = InetAddress.getLocalHost();
                             System.out.println("本机IP地址: "+addr.getHostAddress());
                             int port=1688;
+
+                            DatagramSocket ds=null;   //声明UDP变量
+                            String status="online";   //定义状态值
+
+                            //创建服务，如遇端口占用，则换端口继续尝试创建
                             while (true){
                                 try {
-                                    ServerSocket ss=new ServerSocket(port);
+                                    ds=new DatagramSocket(port);   //创建UDP服务
                                     break;    //如果上面服务创建成功，就会执行这一步退出
                                 } catch (IOException ex) {
-                                    port++;   //否则端口号++;继续创建
-                                    ex.printStackTrace();
+                                    port+=1;   //否则端口号++;继续创建
+//                                    ex.printStackTrace();
 
+                                    System.out.println("端口已经被占用");
                                 }
                             }
 
-
-                            sql="UPDATE users SET ip=?,port=8888 WHERE username=?";
+                            //获取用户id和端口和状态存入数据库
+                            sql="UPDATE users SET ip=?,port=?,status=? WHERE username=?";
                             pstmt=conn.prepareStatement(sql);
                             pstmt.setString(1,addr.getHostAddress());
-                            pstmt.setString(2,username);
-                            pstmt.executeUpdate();
-                            loginf.setVisible(false);
-                            ChatThreadWindow chatThreadWindow=new ChatThreadWindow();
+                            pstmt.setInt(2,port);
+                            pstmt.setString(3,status);
+                            pstmt.setString(4,username);
+                            pstmt.executeUpdate();               //执行sql语句
+
+                            loginf.setVisible(false);             //把登录框关闭
+                            //创建聊天窗口类（登录用户名,UDP通信对象）
+                            ChatThreadWindow chatThreadWindow=new ChatThreadWindow(username,ds);
                         } else {
                             System.out.println("登录失败");
                         }
