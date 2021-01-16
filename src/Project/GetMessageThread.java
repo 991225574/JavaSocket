@@ -27,7 +27,7 @@ public class GetMessageThread extends Thread {
                 ds.receive(dp);
                 String message = new String(buff, 0, dp.getLength());
                 System.out.println("我是message"+message);
-                ta.append(message);
+                ta.append(message+"\n");
 //                if(message.contains("进入了聊天室")) {
                 message = message.replace("进入了聊天室", "");
                 System.out.println("处理后的信息" + message);

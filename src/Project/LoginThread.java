@@ -86,9 +86,11 @@ public class LoginThread extends Thread {
                 PreparedStatement pstmt=null;
                 String sql="";
                 try {
+
+                    //根据输入的密码和数据库取出的密码用md5类判断是否一致
                     String url = "jdbc:oracle:thin:@localhost:1521:orcl";
                     String username_db = "scott";
-                    String password_db = "123";
+                    String password_db = "123123";
                     Connection conn = DriverManager.getConnection(url, username_db, password_db);
                     sql = "SELECT password FROM users WHERE username=?";
                     pstmt = conn.prepareStatement(sql);
@@ -116,11 +118,10 @@ public class LoginThread extends Thread {
                             while (true){
                                 try {
                                     ds=new DatagramSocket(port);   //创建UDP服务
-                                    break;    //如果上面服务创建成功，就会执行这一步退出
+                                    break;     //如果上面服务创建成功，就会执行这一步退出
                                 } catch (IOException ex) {
                                     port+=1;   //否则端口号++;继续创建
 //                                    ex.printStackTrace();
-
                                     System.out.println("端口已经被占用");
                                 }
                             }

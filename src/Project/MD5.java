@@ -22,7 +22,7 @@ public class MD5 {
     }
 //
 //    public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-//        System.out.println(encoderByMd5("liwei123"));
+//        System.out.println(encoderByMd5("hxt123"));
 //    }
 
     /**判断用户密码是否正确

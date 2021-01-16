@@ -37,7 +37,7 @@ public class ChatThreadWindow {
         f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setSize(600, 400);
-        f.setTitle("聊天室" + " - " + name + "     当前在线人数:" + ++total);
+        f.setTitle("聊天室" + " - " + name + "     当前在线人数:"+ ++total);
         f.setLocation(300, 200);
         ta = new JTextArea();
         JScrollPane sp = new JScrollPane(ta);
@@ -68,7 +68,7 @@ public class ChatThreadWindow {
     public void ShowInfoChatRoom(){
         String url="jdbc:oracle:thin:@localhost:1521:orcl";
         String username_db="scott";
-        String pssword_db="123";
+        String pssword_db="123123";
         PreparedStatement pstmt=null;
         Connection conn=null;
 
@@ -91,10 +91,6 @@ public class ChatThreadWindow {
                 for (int i=0;i<ips.length;i++){
                     ipB[i]=(byte)Integer.parseInt(ips[i]);   //把数字强制转换为字节数组类型
                 }
-//                System.out.println(ip);
-//                System.out.println(port);
-//                System.out.println(username);
-//                System.out.println(name);
 
                 //判断不为自己，然后群发消息
                 if(!username.equals(name)){
@@ -105,6 +101,10 @@ public class ChatThreadWindow {
                     dp.setPort(port);                                //设置端口
                     DatagramSocket ds=new DatagramSocket();
                     ds.send(dp);                                     //向已经登录的用户发消息
+
+                    cb.addItem(username);  //把要群发的用户也要添加到自己的下拉框
+                }else{
+                    ta.append(username+"正在聊天室");
                 }
             }
 
