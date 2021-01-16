@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
@@ -57,7 +58,7 @@ public class LoginThread extends Thread {
         t2.setEditable(false);
         loginp.add(t2);
 
-        final JTextField loginPassword = new JTextField("lw1234");
+        final JTextField loginPassword = new JTextField("liwei123");
         loginPassword.setHorizontalAlignment(JTextField.CENTER);
         loginp.add(loginPassword);
         /*
@@ -88,9 +89,9 @@ public class LoginThread extends Thread {
                 PreparedStatement pstmt=null;
                 String sql="";
                 try {
-                    String url = "jdbc:oracle:thin:@localhost:1521:orclhc";
-                    String username_db = "opts";
-                    String password_db = "opts1234";
+                    String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+                    String username_db = "scott";
+                    String password_db = "123";
                     Connection conn = DriverManager.getConnection(url, username_db, password_db);
                     sql = "SELECT password FROM users WHERE username=?";
                     pstmt = conn.prepareStatement(sql);
@@ -98,6 +99,8 @@ public class LoginThread extends Thread {
                     ResultSet rs = pstmt.executeQuery();
                     if (rs.next()) {
                         String encodePassword = rs.getString("PASSWORD");
+                        System.out.println(password);
+
                         if (MD5.checkpassword(password, encodePassword)) {
                             /*
                             获取本机IP
@@ -107,6 +110,19 @@ public class LoginThread extends Thread {
                              */
                             InetAddress addr = InetAddress.getLocalHost();
                             System.out.println("本机IP地址: "+addr.getHostAddress());
+                            int port=1688;
+                            while (true){
+                                try {
+                                    ServerSocket ss=new ServerSocket(port);
+                                    break;    //如果上面服务创建成功，就会执行这一步退出
+                                } catch (IOException ex) {
+                                    port++;   //否则端口号++;继续创建
+                                    ex.printStackTrace();
+
+                                }
+                            }
+
+
                             sql="UPDATE users SET ip=?,port=8888 WHERE username=?";
                             pstmt=conn.prepareStatement(sql);
                             pstmt.setString(1,addr.getHostAddress());

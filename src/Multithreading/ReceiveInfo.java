@@ -14,7 +14,7 @@ public class ReceiveInfo extends Thread {
         this.socket = socket;
     }
 
-    public void run() {
+    public void ru() {
         try {
             while (true) {
                 InputStream is = socket.getInputStream();
