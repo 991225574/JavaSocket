@@ -1,6 +1,8 @@
 package Project;
 
 import java.awt.BorderLayout;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.*;
 import java.sql.*;
@@ -43,6 +45,28 @@ public class ChatThreadWindow {
         JScrollPane sp = new JScrollPane(ta);
         ta.setEditable(false);
         tf = new JTextField();
+        tf.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                  if (e.getKeyCode()==KeyEvent.VK_ENTER){
+                    String val=(String)cb.getSelectedItem();  //获取下拉框的值
+                    if(val.equals("All")){
+                        sendAllMessage();
+                    }
+                  }
+                  tf.setText("");
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
         cb = new JComboBox();
         cb.addItem("All");
         JButton jb = new JButton("私聊窗口");
@@ -62,6 +86,53 @@ public class ChatThreadWindow {
         gt.start();
 
         ShowInfoChatRoom(); //调用提示方法
+    }
+    //作用：获取数据库已登陆的用户信息，然后把自己登陆的信息发给他们
+    public void sendAllMessage(){
+        String url="jdbc:oracle:thin:@localhost:1521:orcl";
+        String username_db="scott";
+        String pssword_db="123123";
+        PreparedStatement pstmt=null;
+        Connection conn=null;
+        ta.append("我说:"+tf.getText()+"\n");
+        try {
+            //查询登陆的用户，且返回他们的ip和port
+            conn=DriverManager.getConnection(url,username_db,pssword_db);
+            String sql="select username,ip,port from users where status='online'";
+            pstmt=conn.prepareStatement(sql);
+            ResultSet rs =pstmt.executeQuery();
+
+            while (rs.next()){
+                String username=rs.getString("username");
+                String ip=rs.getString("ip");
+                int port=rs.getInt("port");
+
+                byte[] ipB=new byte[4];   //定义字节长度为4的数组
+
+                String ips[] =ip.split("\\.");  //把ip中的数字除了.都分割出来
+                //遍历数字出来
+                for (int i=0;i<ips.length;i++){
+                    ipB[i]=(byte)Integer.parseInt(ips[i]);   //把数字强制转换为字节数组类型
+                }
+
+                //判断不为自己，然后群发消息
+                if(!username.equals(name)){
+                    String message=name+"说了:"+tf.getText();
+                    byte[] m=message.getBytes();  //创建一个字节数组
+                    DatagramPacket dp=new DatagramPacket(m,m.length);
+                    dp.setAddress(InetAddress.getByAddress(ipB));    //设置ip地址
+                    dp.setPort(port);                                //设置端口
+                    DatagramSocket ds=new DatagramSocket();
+                    ds.send(dp);                                     //向已经登录的用户发消息
+                }
+            }
+
+
+        } catch (SQLException | UnknownHostException | SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //作用：获取数据库已登陆的用户信息，然后把自己登陆的信息发给他们
@@ -104,7 +175,7 @@ public class ChatThreadWindow {
 
                     cb.addItem(username);  //把要群发的用户也要添加到自己的下拉框
                 }else{
-                    ta.append(username+"正在聊天室");
+                    ta.append(username+"正在聊天室"+"\n");
                 }
             }
 

@@ -26,21 +26,21 @@ public class GetMessageThread extends Thread {
                 DatagramPacket dp = new DatagramPacket(buff, 200);
                 ds.receive(dp);
                 String message = new String(buff, 0, dp.getLength());
-                System.out.println("我是message"+message);
-                ta.append(message+"\n");
-//                if(message.contains("进入了聊天室")) {
-                message = message.replace("进入了聊天室", "");
-                System.out.println("处理后的信息" + message);
-
+                System.out.println("我是message" + message);
+                ta.append(message + "\n");
+                if (message.contains("进入了聊天室")) {
+                    message = message.replace("进入了聊天室", "");
+                    System.out.println("处理后的信息" + message);
                 /*
                 wjl进入了聊天室
                 1.分割上面的消息拿到用户名，例如:wjl
                 2.接着在使用JcomboBox把用户名加入下拉框
                 */
-            cb.addItem(message);  //jiaru下拉框
-            System.out.println("UDP收的消息" + message);
+                cb.addItem(message);  //jiaru下拉框
+                System.out.println("UDP收的消息" + message);
             }
-        } catch (IOException e) {
+        }
+    } catch (IOException e) {
             e.printStackTrace();
         }
     }
